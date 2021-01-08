@@ -1,0 +1,12 @@
+---
+- name: Add gcloud-sdk apt key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+- name: Add gcloud-sdk repo
+  apt_repository:
+    repo: deb https://packages.cloud.google.com/apt cloud-sdk main
+
+- name: Install gcloud-sdk
+  apt:
+    name: google-cloud-sdk

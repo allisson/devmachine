@@ -1,0 +1,52 @@
+---
+- name: Add postgresql apt key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+
+- name: Add postgresql repos
+  apt_repository:
+    repo: deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main
+
+- name: Install postgresql 12
+  apt:
+    pkg:
+    - python3-psycopg2
+    - postgresql-12
+
+- name: Start postgresql service
+  service:
+    name: postgresql
+    state: started
+
+- name: Change pg_hba.conf to enable trust for postgres user
+  replace:
+    path: /etc/postgresql/12/main/pg_hba.conf
+    regexp: 'local   all             postgres                                peer'
+    replace: 'local   all             postgres                                trust'
+  register: postgres_trust
+
+- name: Restart postgresql
+  service:
+    name: postgresql
+    state: restarted
+  when: postgres_trust.changed
+
+- name: Create postgresql user
+  postgresql_user:
+    name: '{{ postgresql_user }}'
+    password: '{{ postgresql_password }}'
+    role_attr_flags: SUPERUSER
+
+- name: Change postgresql.conf
+  lineinfile:
+    path: /etc/postgresql/12/main/postgresql.conf
+    line: listen_addresses = '*'
+  notify:
+    - restart postgresql
+
+- name: Change pg_hba.conf
+  lineinfile: 
+    path: /etc/postgresql/12/main/pg_hba.conf
+    line: host all all 0.0.0.0/0 md5
+  notify:
+    - restart postgresql

@@ -1,0 +1,180 @@
+---
+- name: Install dependencies for asdf plugins
+  apt:
+    pkg:
+    - libssl-dev
+    - zlib1g-dev
+    - libbz2-dev
+    - libreadline-dev
+    - libsqlite3-dev
+    - llvm
+    - libncurses5-dev
+    - xz-utils
+    - tk-dev
+    - libxml2-dev
+    - libxmlsec1-dev
+    - libffi-dev
+    - liblzma-dev
+
+- name: Install openjdk11
+  apt:
+    name: openjdk-11-jdk
+  when: asdf_kotlin_enabled
+
+- name: Check asdf install
+  stat: path='{{ home }}/.asdf'
+  register: check_asdf_install
+
+- name: Install asdf
+  git:
+    repo: 'https://github.com/asdf-vm/asdf.git'
+    dest: '{{ home }}/.asdf'
+    version: '{{ asdf_version }}'
+  become_user: vagrant
+  when: check_asdf_install.stat.exists == false
+
+- name: Add asdf to bash shell
+  lineinfile:
+    path: '{{ home }}/.bashrc'
+    line: . $HOME/.asdf/asdf.sh
+    create: yes
+  become_user: vagrant
+  when: check_asdf_install.stat.exists == false
+
+- name: Add asdf completion to bash shell
+  lineinfile:
+    path: '{{ home }}/.bashrc'
+    line: . $HOME/.asdf/completions/asdf.bash
+    create: yes
+  become_user: vagrant
+  when: check_asdf_install.stat.exists == false
+
+- name: Check if golang plugin exists
+  stat: path='{{ home }}/.asdf/plugins/golang'
+  register: check_go_plugin
+
+- name: Install golang plugin
+  shell: 'source {{ home }}/.asdf/asdf.sh && asdf plugin-add golang https://github.com/kennyp/asdf-golang.git'
+  become_user: vagrant
+  when:
+    - asdf_golang_enabled
+    - check_go_plugin.stat.exists == false
+  args:
+    executable: /bin/bash
+
+- name: Check if nodejs plugin exists
+  stat: path='{{ home }}/.asdf/plugins/nodejs'
+  register: check_nodejs_plugin
+
+- name: Install nodejs plugin
+  shell: 'source {{ home }}/.asdf/asdf.sh && asdf plugin-add nodejs https://github.com/asdf-vm/asdf-nodejs.git && bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring'
+  become_user: vagrant
+  when:
+    - asdf_nodejs_enabled
+    - check_nodejs_plugin.stat.exists == false
+  args:
+    executable: /bin/bash
+
+- name: Check if python plugin exists
+  stat: path='{{ home }}/.asdf/plugins/python'
+  register: check_python_plugin
+
+- name: Install python plugin
+  shell: 'source {{ home }}/.asdf/asdf.sh && asdf plugin-add python'
+  become_user: vagrant
+  when:
+    - asdf_python_enabled
+    - check_python_plugin.stat.exists == false
+  args:
+    executable: /bin/bash
+
+- name: Check if ruby plugin exists
+  stat: path='{{ home }}/.asdf/plugins/ruby'
+  register: check_ruby_plugin
+
+- name: Install ruby plugin
+  shell: 'source {{ home }}/.asdf/asdf.sh && asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git'
+  become_user: vagrant
+  when:
+    - asdf_ruby_enabled
+    - check_ruby_plugin.stat.exists == false
+  args:
+    executable: /bin/bash
+
+- name: Check if kotlin plugin exists
+  stat: path='{{ home }}/.asdf/plugins/kotlin'
+  register: check_kotlin_plugin
+
+- name: Install kotlin plugin
+  shell: 'source {{ home }}/.asdf/asdf.sh && asdf plugin-add kotlin https://github.com/asdf-community/asdf-kotlin.git'
+  become_user: vagrant
+  when:
+    - asdf_kotlin_enabled
+    - check_kotlin_plugin.stat.exists == false
+  args:
+    executable: /bin/bash
+
+- name: Check golang install
+  stat: path='{{ home }}/.asdf/installs/golang/{{ asdf_golang_version }}'
+  register: check_go_install
+
+- name: Install golang
+  shell: 'source {{ home }}/.asdf/asdf.sh && asdf install golang {{ asdf_golang_version }} && asdf global golang {{ asdf_golang_version }}'
+  become_user: vagrant
+  when:
+    - asdf_golang_enabled
+    - check_go_install.stat.exists == false
+  args:
+    executable: /bin/bash
+
+- name: Check nodejs install
+  stat: path='{{ home }}/.asdf/installs/nodejs/{{ asdf_nodejs_version }}'
+  register: check_nodejs_install
+
+- name: Install nodejs
+  shell: 'source {{ home }}/.asdf/asdf.sh && asdf install nodejs {{ asdf_nodejs_version }} && asdf global nodejs {{ asdf_nodejs_version }}'
+  become_user: vagrant
+  when:
+    - asdf_nodejs_enabled
+    - check_nodejs_install.stat.exists == false
+  args:
+    executable: /bin/bash
+
+- name: Check python install
+  stat: path='{{ home }}/.asdf/installs/python/{{ asdf_python_version }}'
+  register: check_python_install
+
+- name: Install python
+  shell: 'source {{ home }}/.asdf/asdf.sh && asdf install python {{ asdf_python_version }} && asdf global python {{ asdf_python_version }}'
+  become_user: vagrant
+  when:
+    - asdf_python_enabled
+    - check_python_install.stat.exists == false
+  args:
+    executable: /bin/bash
+
+- name: Check ruby install
+  stat: path='{{ home }}/.asdf/installs/ruby/{{ asdf_ruby_version }}'
+  register: check_ruby_install
+
+- name: Install ruby
+  shell: 'source {{ home }}/.asdf/asdf.sh && asdf install ruby {{ asdf_ruby_version }} && asdf global ruby {{ asdf_ruby_version }}'
+  become_user: vagrant
+  when:
+    - asdf_ruby_enabled
+    - check_ruby_install.stat.exists == false
+  args:
+    executable: /bin/bash
+
+- name: Check kotlin install
+  stat: path='{{ home }}/.asdf/installs/kotlin/{{ asdf_kotlin_version }}'
+  register: check_kotlin_install
+
+- name: Install kotlin
+  shell: 'source {{ home }}/.asdf/asdf.sh && asdf install kotlin {{ asdf_kotlin_version }} && asdf global kotlin {{ asdf_kotlin_version }}'
+  become_user: vagrant
+  when:
+    - asdf_kotlin_enabled
+    - check_kotlin_install.stat.exists == false
+  args:
+    executable: /bin/bash

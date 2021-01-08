@@ -1,0 +1,17 @@
+---
+- name: Add mongodb apt key
+  apt_key:
+    url: https://www.mongodb.org/static/pgp/server-3.6.asc
+
+- name: Add mongodb repo
+  apt_repository:
+    repo: deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/3.6 multiverse
+
+- name: Install mongodb server
+  apt:
+    name: mongodb-org
+
+- name: Start mongodb service
+  service:
+    name: mongod
+    state: started

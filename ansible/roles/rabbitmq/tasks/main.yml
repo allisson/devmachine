@@ -1,0 +1,26 @@
+---
+- name: Add rabbitmq bintray apt key
+  apt_key:
+    url: https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc
+
+- name: Add rabbitmq apt key
+  apt_key:
+    url: https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+
+- name: Add rabbitmq repo
+  apt_repository:
+    repo: deb https://dl.bintray.com/rabbitmq-erlang/debian focal erlang
+
+- name: Install rabbitmq server
+  apt:
+    name: rabbitmq-server
+  register: rabbitmq_install
+
+- name: Enable management dashboard
+  shell: rabbitmq-plugins enable rabbitmq_management
+  when: rabbitmq_install.changed
+
+- name: Start rabbitmq service
+  service:
+    name: rabbitmq-server
+    state: started

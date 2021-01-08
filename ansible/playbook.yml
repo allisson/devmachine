@@ -1,0 +1,29 @@
+---
+- name: Devmachine setup
+  hosts: all
+  become: yes
+  roles:
+    - base
+    - bashit
+    - tmux
+    - docker
+    - asdf
+    - postgresql12
+    - mongodb36
+    - rabbitmq
+    - gcloud
+  vars:
+    home: /home/vagrant
+    asdf_version: v0.8.0
+    asdf_golang_enabled: true
+    asdf_golang_version: 1.15.6
+    asdf_nodejs_enabled: true
+    asdf_nodejs_version: 10.23.1
+    asdf_python_enabled: true
+    asdf_python_version: 3.9.1
+    asdf_ruby_enabled: true
+    asdf_ruby_version: 2.7.2
+    asdf_kotlin_enabled: true
+    asdf_kotlin_version: 1.4.21
+    postgresql_user: vagrant
+    postgresql_password: vagrant

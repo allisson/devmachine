@@ -1,0 +1,21 @@
+---
+- name: Update packages
+  apt: update_cache=yes upgrade=dist
+
+- name: Install base packages
+  apt:
+    pkg:
+    - wget
+    - curl
+    - build-essential
+    - vim
+    - git-core
+    - unzip
+    - apt-transport-https 
+    - ca-certificates 
+    - gnupg
+    - net-tools
+
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes

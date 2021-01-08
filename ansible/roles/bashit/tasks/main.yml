@@ -1,0 +1,18 @@
+---
+- name: Check bash-it install
+  stat: path='{{ home }}/.bash_it'
+  register: check_bashit_install
+
+- name: Clone bash-it repo
+  git:
+    repo: 'https://github.com/Bash-it/bash-it.git'
+    dest: '{{ home }}/.bash_it'
+  become_user: vagrant
+  when: check_bashit_install.stat.exists == false
+
+- name: Install bash-it
+  shell: '{{ home }}/.bash_it/install.sh --silent'
+  become_user: vagrant
+  args:
+    executable: /bin/bash
+  when: check_bashit_install.stat.exists == false

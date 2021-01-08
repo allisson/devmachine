@@ -1,0 +1,37 @@
+---
+- name: Install tmux package
+  apt:
+    name: tmux
+
+- name: Check .tmux install
+  stat: path='{{ home }}/.tmux'
+  register: check_dot_tmux_install
+
+- name: Install .tmux
+  git:
+    repo: 'https://github.com/gpakosz/.tmux.git'
+    dest: '{{ home }}/.tmux'
+  become_user: vagrant
+  when: check_dot_tmux_install.stat.exists == false
+
+- name: Create .tmux symbolic link
+  file:
+    src: '{{ home }}/.tmux/.tmux.conf'
+    dest: '{{ home }}/.tmux.conf'
+    state: link
+  become_user: vagrant
+  when: check_dot_tmux_install.stat.exists == false
+
+- name: Create .tmux local config
+  copy:
+    src: '{{ home }}/.tmux/.tmux.conf.local'
+    dest: '{{ home }}/.tmux.conf.local'
+    remote_src: yes
+  become_user: vagrant
+  when: check_dot_tmux_install.stat.exists == false
+
+- name: Configure tmux to use mouse by default
+  lineinfile:
+    path: '{{ home }}/.tmux.conf.local'
+    line: set -g mouse on
+    create: yes
