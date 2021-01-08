@@ -14,6 +14,8 @@
     - gcloud
   vars:
     home: /home/vagrant
+    git_name: 'Allisson Azevedo'
+    git_email: 'allisson@gmail.com'
     asdf_version: v0.8.0
     asdf_golang_enabled: true
     asdf_golang_version: 1.15.6

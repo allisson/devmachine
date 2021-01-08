@@ -19,3 +19,22 @@
 - name: Remove dependencies that are no longer required
   apt:
     autoremove: yes
+
+- name: Check if .gitconfig exists
+  stat: path='{{ home }}/.gitconfig'
+  register: check_gitconfig
+
+- name: Create .gitconfig file
+  become_user: vagrant
+  blockinfile:
+    path: '{{ home }}/.gitconfig'
+    block: |
+      [url "git@github.com:"]
+        insteadOf = https://github.com/
+      [user]
+        name = {{ git_name }}
+        email = {{ git_email }}
+      [pull]
+        rebase = true
+    create: yes
+  when: check_gitconfig.stat.exists == false
